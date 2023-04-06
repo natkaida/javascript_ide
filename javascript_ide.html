@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JavaScript IDE - эмуляция вывода в console.log()</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        color: rgb(148 163 184);
+        background-color: rgb(15 23 42);
+      }
+      .btn:focus,.btn:active {
+       outline: none !important;
+       box-shadow: none;
+      } 
+      
+      #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+      .ace_editor {
+      border-radius: 5px;
+      border: 5px;
+      }
+     
+      .window {
+        display: inline-block;
+        vertical-align: top;
+        width: 100%;
+        height: 300px;
+        padding: 10px;
+        box-sizing: border-box;
+        position: relative;
+        border-radius: 5px;
+      }
+      
+     
+      #consoleOutput {
+        white-space: pre-wrap;
+
+      }
+      #consoleOutputContainer {
+        background-color: #282a36;
+        color: rgb(226 232 240);
+        font-family: 'Courier New', Courier, monospace;
+      }
+      
+      
+      @media (max-width: 768px) {
+        .window {
+          display: block;
+          width: 100%;
+        }
+        #editorContainer {
+          margin-bottom: 20px;
+        }
+      }
+      
+      @media (max-width: 576px) {
+        .my-2 {
+          flex-direction: column;
+        }
+        #runButton, #clearButton {
+          margin: 10px 0;
+        }
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  </head>
+  <body>
+    <h1 class="text-center mt-5 fw-bold">JavaScript IDE</h1>
+    <h6 class="text-center mt-2">эмуляция вывода в console.log</h6>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="text-center">
+            <h6 class="text-uppercase fw-bold">Код</h6>
+          </div>
+          <div id="editorContainer" class="window mx-2">
+            <div id="editor"></div>
+          </div>
+          <div class="my-4">
+            <button id="runButton" class="btn btn-primary mx-2">Выполнить</button>
+            <button id="clearButton" class="btn btn-danger mx-2">Очистить вывод</button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="text-center">
+            <h6 class="text-uppercase fw-bold">Результат</h6>
+          </div>
+          <div id="consoleOutputContainer" class="window mx-2">
+            <div id="consoleOutput"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+const editor = ace.edit("editor");
+editor.setTheme("ace/theme/dracula");
+editor.session.setMode("ace/mode/javascript");
+editor.setShowPrintMargin(false);
+
+const runButton = document.getElementById("runButton");
+const clearButton = document.getElementById("clearButton");
+const consoleOutput = document.getElementById("consoleOutput");
+
+window.addEventListener("load", () => {
+  let savedCode = localStorage.getItem("userCode");
+  if (savedCode) {
+    editor.setValue(savedCode);
+  }
+});
+
+editor.on("change", () => {
+  let userCode = editor.getValue();
+  localStorage.setItem("userCode", userCode);
+});
+
+runButton.addEventListener("click", () => {
+  consoleOutput.innerHTML = "";
+
+  try {
+    let logOutput = "";
+    console.log = function(msg) {
+      logOutput += msg + "\n";
+    };
+
+    eval(editor.getValue());
+
+    consoleOutput.innerHTML = logOutput;
+  } catch (error) {
+    consoleOutput.innerHTML = error.message;
+  }
+});
+
+function clearOutput() {
+  consoleOutput.innerHTML = "";
+}
+
+clearButton.addEventListener("click", clearOutput);
+    </script>
+  </body>
+</html>
